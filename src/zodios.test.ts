@@ -1,15 +1,15 @@
 import { AxiosError } from "axios";
 import express from "express";
+import multer from "multer";
 import { AddressInfo } from "net";
-import { z, ZodError } from "zod";
-globalThis.FormData = require("form-data");
+import { z, ZodError } from "zod/v4";
+import { apiBuilder } from "./api";
+import { Assert } from "./utils.types";
 import { Zodios } from "./zodios";
 import { ZodiosError } from "./zodios-error";
-import multer from "multer";
+import { isErrorFromAlias, isErrorFromPath } from "./zodios-error.utils";
 import { ZodiosPlugin } from "./zodios.types";
-import { apiBuilder } from "./api";
-import { isErrorFromPath, isErrorFromAlias } from "./zodios-error.utils";
-import { Assert } from "./utils.types";
+globalThis.FormData = require("form-data");
 
 const multipart = multer({ storage: multer.memoryStorage() });
 
@@ -791,13 +791,12 @@ status: 200 OK
 cause:
 [
   {
-    "code": "invalid_type",
     "expected": "string",
-    "received": "undefined",
+    "code": "invalid_type",
     "path": [
       "more"
     ],
-    "message": "Required"
+    "message": "Invalid input: expected string, received undefined"
   }
 ]
 received:

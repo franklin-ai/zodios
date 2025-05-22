@@ -1,4 +1,4 @@
-import { z, ZodType } from "zod";
+import { z, ZodType } from "zod/v4";
 
 /**
  * filter an array type by a predicate value

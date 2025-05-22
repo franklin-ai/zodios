@@ -1,15 +1,15 @@
 // disable type checking for this file as we need to defer type checking when using these utility types
 // indeed typescript seems to have a bug, where it tries to infer the type of an undecidable generic type
 // but when using the functions, types are inferred correctly
-import {
-  ZodiosEndpointDefinition,
-  ZodiosEndpointParameter,
-  ZodiosEndpointDefinitions,
-  ZodiosEndpointError,
-} from "./zodios.types";
-import z, { ZodRawShape } from "zod";
+import z from "zod/v4";
 import { capitalize } from "./utils";
 import { Narrow, TupleFlat, UnionToTuple } from "./utils.types";
+import {
+  ZodiosEndpointDefinition,
+  ZodiosEndpointDefinitions,
+  ZodiosEndpointError,
+  ZodiosEndpointParameter,
+} from "./zodios.types";
 
 /**
  * check api for non unique paths
@@ -84,7 +84,7 @@ export function parametersBuilder() {
 
 type ObjectToQueryParameters<
   Type extends "Query" | "Path" | "Header",
-  T extends Record<string, z.ZodType<any, any, any>>,
+  T extends Record<string, z.ZodType>,
   Keys = UnionToTuple<keyof T>
 > = {
   [Index in keyof Keys]: {
@@ -101,7 +101,7 @@ class ParametersBuilder<T extends ZodiosEndpointParameter[]> {
   addParameter<
     Name extends string,
     Type extends "Path" | "Query" | "Body" | "Header",
-    Schema extends z.ZodType<any, any, any>
+    Schema extends z.ZodType
   >(name: Name, type: Type, schema: Schema) {
     return new ParametersBuilder<
       [...T, { name: Name; type: Type; description?: string; schema: Schema }]
@@ -113,7 +113,7 @@ class ParametersBuilder<T extends ZodiosEndpointParameter[]> {
 
   addParameters<
     Type extends "Query" | "Path" | "Header",
-    Schemas extends Record<string, z.ZodType<any, any, any>>
+    Schemas extends Record<string, z.ZodType>
   >(type: Type, schemas: Schemas) {
     const parameters = Object.keys(schemas).map((key) => ({
       name: key,
@@ -132,46 +132,40 @@ class ParametersBuilder<T extends ZodiosEndpointParameter[]> {
     >([...this.params, ...parameters] as any);
   }
 
-  addBody<Schema extends z.ZodType<any, any, any>>(schema: Schema) {
+  addBody<Schema extends z.ZodType>(schema: Schema) {
     return this.addParameter("body", "Body", schema);
   }
 
-  addQuery<Name extends string, Schema extends z.ZodType<any, any, any>>(
+  addQuery<Name extends string, Schema extends z.ZodType>(
     name: Name,
     schema: Schema
   ) {
     return this.addParameter(name, "Query", schema);
   }
 
-  addPath<Name extends string, Schema extends z.ZodType<any, any, any>>(
+  addPath<Name extends string, Schema extends z.ZodType>(
     name: Name,
     schema: Schema
   ) {
     return this.addParameter(name, "Path", schema);
   }
 
-  addHeader<Name extends string, Schema extends z.ZodType<any, any, any>>(
+  addHeader<Name extends string, Schema extends z.ZodType>(
     name: Name,
     schema: Schema
   ) {
     return this.addParameter(name, "Header", schema);
   }
 
-  addQueries<Schemas extends Record<string, z.ZodType<any, any, any>>>(
-    schemas: Schemas
-  ) {
+  addQueries<Schemas extends Record<string, z.ZodType>>(schemas: Schemas) {
     return this.addParameters("Query", schemas);
   }
 
-  addPaths<Schemas extends Record<string, z.ZodType<any, any, any>>>(
-    schemas: Schemas
-  ) {
+  addPaths<Schemas extends Record<string, z.ZodType>>(schemas: Schemas) {
     return this.addParameters("Path", schemas);
   }
 
-  addHeaders<Schemas extends Record<string, z.ZodType<any, any, any>>>(
-    schemas: Schemas
-  ) {
+  addHeaders<Schemas extends Record<string, z.ZodType>>(schemas: Schemas) {
     return this.addParameters("Header", schemas);
   }
 
@@ -244,10 +238,10 @@ export function apiBuilder(endpoint?: any) {
  * @param schema - the schema of the resource
  * @returns - the api definitions
  */
-export function makeCrudApi<
-  T extends string,
-  S extends z.ZodObject<z.ZodRawShape>
->(resource: T, schema: S) {
+export function makeCrudApi<T extends string, S extends z.ZodObject>(
+  resource: T,
+  schema: S
+) {
   type Schema = z.input<S>;
   const capitalizedResource = capitalize(resource);
   return makeApi([
@@ -282,7 +276,7 @@ export function makeCrudApi<
           name: "body",
           type: "Body",
           description: "The object to create",
-          schema: schema.partial() as z.Schema<Partial<Schema>>,
+          schema: schema.partial() as z.ZodType<Partial<Schema>>,
         },
       ],
       // @ts-expect-error
@@ -319,7 +313,7 @@ export function makeCrudApi<
           name: "body",
           type: "Body",
           description: "The object to patch",
-          schema: schema.partial() as z.Schema<Partial<Schema>>,
+          schema: schema.partial() as z.ZodSchema<Partial<Schema>>,
         },
       ],
       // @ts-expect-error
