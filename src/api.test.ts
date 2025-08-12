@@ -98,7 +98,7 @@ describe("makeApi", () => {
       {
         method: "post",
         path: "/users/:id",
-        alias: "createtUser",
+        alias: "createUser",
         description: "Create a user",
         parameters: [
           {
@@ -148,7 +148,7 @@ describe("makeApi", () => {
         {
           method: "post";
           path: "/users/:id";
-          alias: "createtUser";
+          alias: "createUser";
           description: "Create a user";
           parameters: [
             {

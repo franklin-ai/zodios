@@ -1,5 +1,5 @@
 import { AxiosResponse } from "axios";
-import { ReadonlyDeep } from "../utils.types";
+import { DeepReadonlyObject, ReadonlyDeep } from "../utils.types";
 import {
   AnyZodiosRequestOptions,
   Method,
@@ -85,7 +85,7 @@ export class ZodiosPlugins {
   async interceptRequest(
     api: ZodiosEndpointDefinitions,
     config: ReadonlyDeep<AnyZodiosRequestOptions>
-  ) {
+  ): Promise<DeepReadonlyObject<AnyZodiosRequestOptions>> {
     let pluginConfig = config;
     for (const plugin of this.plugins) {
       if (plugin?.request) {
