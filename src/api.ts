@@ -1,7 +1,7 @@
 // disable type checking for this file as we need to defer type checking when using these utility types
 // indeed typescript seems to have a bug, where it tries to infer the type of an undecidable generic type
 // but when using the functions, types are inferred correctly
-import z from "zod/v4";
+import z4 from "zod/v4";
 import { capitalize } from "./utils";
 import { Narrow, TupleFlat, UnionToTuple } from "./utils.types";
 import {
@@ -17,7 +17,7 @@ import {
  * @return - nothing
  * @throws - error if api has non unique paths
  */
-export function checkApi<T extends ZodiosEndpointDefinitions>(api: T) {
+export function checkApi<Api extends ZodiosEndpointDefinitions>(api: Api) {
   // check if no duplicate path
   const paths = new Set<string>();
   for (let endpoint of api) {
@@ -27,6 +27,7 @@ export function checkApi<T extends ZodiosEndpointDefinitions>(api: T) {
     }
     paths.add(fullpath);
   }
+
   // check if no duplicate alias
   const aliases = new Set<string>();
   for (let endpoint of api) {
@@ -54,21 +55,30 @@ export function checkApi<T extends ZodiosEndpointDefinitions>(api: T) {
 /**
  * Simple helper to split your api definitions into multiple files
  * Mandatory to be used when declaring your endpoint definitions outside zodios constructor
- * to enable type inferrence and autocompletion
+ * to enable type inference and autocompletion
  * @param api - api definitions
  * @returns the api definitions
  */
-export function makeApi<Api extends ZodiosEndpointDefinitions>(
+export function makeApi<S extends z4.core.$ZodType,  Api extends ZodiosEndpointDefinitions<S>>(
   api: Narrow<Api>
 ): Api {
   checkApi(api);
   return api as Api;
 }
 
+/*
+
+Api < ZodiosEndpointDefinition (made out of)
+api -> Gets narrowed / reduce
+
+ZodiosEndpointDefinition -> API -> Narrow API -> CheckAPI -> ZodiosEndpointDefinitions
+
+*/
+
 /**
  * Simple helper to split your parameter definitions into multiple files
- * Mandatory to be used when declaring parameters appart from your endpoint definitions
- * to enable type inferrence and autocompletion
+ * Mandatory to be used when declaring parameters apart from your endpoint definitions
+ * to enable type inference and autocompletion
  * @param params - api parameter definitions
  * @returns the api parameter definitions
  */
@@ -84,7 +94,7 @@ export function parametersBuilder() {
 
 type ObjectToQueryParameters<
   Type extends "Query" | "Path" | "Header",
-  T extends Record<string, z.ZodType>,
+  T extends Record<string, z4.ZodType>,
   Keys = UnionToTuple<keyof T>
 > = {
   [Index in keyof Keys]: {
@@ -101,7 +111,7 @@ class ParametersBuilder<T extends ZodiosEndpointParameter[]> {
   addParameter<
     Name extends string,
     Type extends "Path" | "Query" | "Body" | "Header",
-    Schema extends z.ZodType
+    Schema extends z4.ZodType
   >(name: Name, type: Type, schema: Schema) {
     return new ParametersBuilder<
       [...T, { name: Name; type: Type; description?: string; schema: Schema }]
@@ -113,7 +123,7 @@ class ParametersBuilder<T extends ZodiosEndpointParameter[]> {
 
   addParameters<
     Type extends "Query" | "Path" | "Header",
-    Schemas extends Record<string, z.ZodType>
+    Schemas extends Record<string, z4.ZodType>
   >(type: Type, schemas: Schemas) {
     const parameters = Object.keys(schemas).map((key) => ({
       name: key,
@@ -132,40 +142,40 @@ class ParametersBuilder<T extends ZodiosEndpointParameter[]> {
     >([...this.params, ...parameters] as any);
   }
 
-  addBody<Schema extends z.ZodType>(schema: Schema) {
+  addBody<Schema extends z4.ZodType>(schema: Schema) {
     return this.addParameter("body", "Body", schema);
   }
 
-  addQuery<Name extends string, Schema extends z.ZodType>(
+  addQuery<Name extends string, Schema extends z4.ZodType>(
     name: Name,
     schema: Schema
   ) {
     return this.addParameter(name, "Query", schema);
   }
 
-  addPath<Name extends string, Schema extends z.ZodType>(
+  addPath<Name extends string, Schema extends z4.ZodType>(
     name: Name,
     schema: Schema
   ) {
     return this.addParameter(name, "Path", schema);
   }
 
-  addHeader<Name extends string, Schema extends z.ZodType>(
+  addHeader<Name extends string, Schema extends z4.ZodType>(
     name: Name,
     schema: Schema
   ) {
     return this.addParameter(name, "Header", schema);
   }
 
-  addQueries<Schemas extends Record<string, z.ZodType>>(schemas: Schemas) {
+  addQueries<Schemas extends Record<string, z4.ZodType>>(schemas: Schemas) {
     return this.addParameters("Query", schemas);
   }
 
-  addPaths<Schemas extends Record<string, z.ZodType>>(schemas: Schemas) {
+  addPaths<Schemas extends Record<string, z4.ZodType>>(schemas: Schemas) {
     return this.addParameters("Path", schemas);
   }
 
-  addHeaders<Schemas extends Record<string, z.ZodType>>(schemas: Schemas) {
+  addHeaders<Schemas extends Record<string, z4.ZodType>>(schemas: Schemas) {
     return this.addParameters("Header", schemas);
   }
 
@@ -176,8 +186,8 @@ class ParametersBuilder<T extends ZodiosEndpointParameter[]> {
 
 /**
  * Simple helper to split your error definitions into multiple files
- * Mandatory to be used when declaring errors appart from your endpoint definitions
- * to enable type inferrence and autocompletion
+ * Mandatory to be used when declaring errors apart from your endpoint definitions
+ * to enable type inference and autocompletion
  * @param errors - api error definitions
  * @returns the error definitions
  */
@@ -189,8 +199,8 @@ export function makeErrors<ErrorDescription extends ZodiosEndpointError[]>(
 
 /**
  * Simple helper to split your error definitions into multiple files
- * Mandatory to be used when declaring errors appart from your endpoint definitions
- * to enable type inferrence and autocompletion
+ * Mandatory to be used when declaring errors apart from your endpoint definitions
+ * to enable type inference and autocompletion
  * @param endpoint - api endpoint definition
  * @returns the endpoint definition
  */
@@ -205,7 +215,7 @@ export class Builder<T extends ZodiosEndpointDefinitions> {
     endpoint: Narrow<E>
   ): Builder<[...T, E]> {
     if (this.api.length === 0) {
-      this.api = [endpoint] as T;
+      this.api = [endpoint] as unknown as T;
       return this as any;
     }
     this.api = [...this.api, endpoint] as any;
@@ -238,37 +248,32 @@ export function apiBuilder(endpoint?: any) {
  * @param schema - the schema of the resource
  * @returns - the api definitions
  */
-export function makeCrudApi<T extends string, S extends z.ZodObject>(
+export function makeCrudApi<
+  T extends string,
+  S extends z4.ZodObject
+>(
   resource: T,
   schema: S
 ) {
-  type Schema = z.input<S>;
   const capitalizedResource = capitalize(resource);
-  return makeApi([
+  return makeApi<S, ZodiosEndpointDefinitions<S>>([
     {
       method: "get",
-      // @ts-expect-error
       path: `/${resource}s`,
-      // @ts-expect-error
       alias: `get${capitalizedResource}s`,
       description: `Get all ${resource}s`,
-      response: z.array(schema),
+      response: z4.array(schema),
     },
     {
       method: "get",
-      // @ts-expect-error
       path: `/${resource}s/:id`,
-      // @ts-expect-error
       alias: `get${capitalizedResource}`,
       description: `Get a ${resource}`,
-      // @ts-expect-error
       response: schema,
     },
     {
       method: "post",
-      // @ts-expect-error
       path: `/${resource}s`,
-      // @ts-expect-error
       alias: `create${capitalizedResource}`,
       description: `Create a ${resource}`,
       parameters: [
@@ -279,14 +284,11 @@ export function makeCrudApi<T extends string, S extends z.ZodObject>(
           schema: schema.partial(), // as z.ZodType<Partial<Schema>>,
         },
       ],
-      // @ts-expect-error
       response: schema,
     },
     {
       method: "put",
-      // @ts-expect-error
       path: `/${resource}s/:id`,
-      // @ts-expect-error
       alias: `update${capitalizedResource}`,
       description: `Update a ${resource}`,
       parameters: [
@@ -294,18 +296,14 @@ export function makeCrudApi<T extends string, S extends z.ZodObject>(
           name: "body",
           type: "Body",
           description: "The object to update",
-          // @ts-expect-error
           schema: schema,
         },
       ],
-      // @ts-expect-error
       response: schema,
     },
     {
       method: "patch",
-      // @ts-expect-error
       path: `/${resource}s/:id`,
-      // @ts-expect-error
       alias: `patch${capitalizedResource}`,
       description: `Patch a ${resource}`,
       parameters: [
@@ -316,17 +314,13 @@ export function makeCrudApi<T extends string, S extends z.ZodObject>(
           schema: schema.partial(), // as z.ZodSchema<Partial<Schema>>,
         },
       ],
-      // @ts-expect-error
       response: schema,
     },
     {
       method: "delete",
-      // @ts-expect-error
       path: `/${resource}s/:id`,
-      // @ts-expect-error
       alias: `delete${capitalizedResource}`,
       description: `Delete a ${resource}`,
-      // @ts-expect-error
       response: schema,
     },
   ]);

@@ -1,4 +1,4 @@
-import { z, ZodType } from "zod/v4";
+import type * as z4 from "zod/v4";
 
 /**
  * filter an array type by a predicate value
@@ -48,23 +48,17 @@ export type DefinedArray<
 
 type Try<A, B, C> = A extends B ? A : C;
 
-type NarrowRaw<T> =
-  | (T extends Function ? T : never)
-  | (T extends string | number | bigint | boolean ? T : never)
-  | (T extends [] ? [] : never)
-  | {
-      [K in keyof T]: K extends "description" ? T[K] : NarrowNotZod<T[K]>;
-    };
+export type Narrow<T> =
+  // If it's a Zod schema, don't try and process it 
+  T extends z4.core.$ZodType ? T :
 
-type NarrowNotZod<T> = Try<T, ZodType, NarrowRaw<T>>;
+  // If it's an array, unwrap its element type recursively
+  T extends (infer U)[] ? Narrow<U>[] :
 
-/**
- * Utility to infer the embedded primitive type of any type
- * Same as `as const` but without setting the object as readonly and without needing the user to use it
- * @param T - type to infer the embedded type of
- * @see - thank you tannerlinsley for this idea
- */
-export type Narrow<T> = Try<T, [], NarrowNotZod<T>>;
+  // If it's an object, unwrap each property recursively
+  T extends Record<string | number | symbol, any>
+    ? { [K in keyof T]: Narrow<T[K]> }
+    : T;
 
 /**
  * merge all union types into a single type
@@ -234,10 +228,10 @@ export type MapSchemaParameters<
           Frontend,
           Merge<
             {
-              [Key in Name]: Schema extends z.ZodType
+              [Key in Name]: Schema extends z4.ZodType
                 ? Frontend extends true
-                  ? z.input<Schema>
-                  : z.output<Schema>
+                  ? z4.input<Schema>
+                  : z4.output<Schema>
                 : never;
             },
             Acc

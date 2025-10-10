@@ -67,6 +67,7 @@ export function zodValidationPlugin({
             const { name, schema, type } = parameter;
             const value = paramsOf[type](name);
             if (sendDefaults || value !== undefined) {
+              // @ts-expect-error
               const parsed = await schema.safeParseAsync(value);
               if (!parsed.success) {
                 throw new ZodiosError(
@@ -99,6 +100,7 @@ export function zodValidationPlugin({
               "application/vnd.api+json"
             )
           ) {
+            // @ts-expect-error
             const parsed = await endpoint.response.safeParseAsync(
               response.data
             );

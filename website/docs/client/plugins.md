@@ -129,7 +129,7 @@ export type ZodiosPlugin = {
    * @returns possibly a new request config
    */
   request?: (
-    api: ZodiosEnpointDescriptions,
+    api: ZodiosEndpointDescriptions,
     config: AnyZodiosRequestOptions
   ) => Promise<AnyZodiosRequestOptions>;
   /**
@@ -140,7 +140,7 @@ export type ZodiosPlugin = {
    * @returns possibly a new response
    */
   response?: (
-    api: ZodiosEnpointDescriptions,
+    api: ZodiosEndpointDescriptions,
     config: AnyZodiosRequestOptions,
     response: AxiosResponse
   ) => Promise<AxiosResponse>;
@@ -153,7 +153,7 @@ export type ZodiosPlugin = {
    * @returns possibly a new response or throw a new error
    */
   error?: (
-    api: ZodiosEnpointDescriptions,
+    api: ZodiosEndpointDescriptions,
     config: AnyZodiosRequestOptions,
     error: Error
   ) => Promise<AxiosResponse>;

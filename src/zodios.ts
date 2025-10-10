@@ -46,7 +46,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
 
   /**
    * constructor
-   * @param baseURL - the base url to use - if omited will use the browser domain
+   * @param baseURL - the base url to use - if omitted will use the browser domain
    * @param api - the description of all the api endpoints
    * @param options - the options to setup the client API
    * @example
@@ -157,7 +157,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
     return undefined;
   }
 
-  private findEnpointPlugins(method: Method, path: string) {
+  private findEndpointPlugins(method: Method, path: string) {
     return this.endpointPlugins.get(`${method}-${path}`);
   }
 
@@ -203,7 +203,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
       typeof args[1] === "string" &&
       typeof args[2] === "object"
     ) {
-      const plugins = this.findEnpointPlugins(args[0] as Method, args[1]);
+      const plugins = this.findEndpointPlugins(args[0] as Method, args[1]);
       if (!plugins)
         throw new Error(
           `Zodios: no endpoint '${args[0]} ${args[1]}' found to register plugin`
@@ -269,7 +269,7 @@ export class ZodiosClass<Api extends ZodiosEndpointDefinitions> {
   > {
     let conf = config as unknown as ReadonlyDeep<AnyZodiosRequestOptions>;
     const anyPlugin = this.getAnyEndpointPlugins()!;
-    const endpointPlugin = this.findEnpointPlugins(conf.method, conf.url);
+    const endpointPlugin = this.findEndpointPlugins(conf.method, conf.url);
     conf = await anyPlugin.interceptRequest(this.api, conf);
     if (endpointPlugin) {
       conf = await endpointPlugin.interceptRequest(this.api, conf);

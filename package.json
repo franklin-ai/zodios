@@ -1,25 +1,25 @@
 {
-  "name": "@tunarr/zodios-core",
+  "name": "@zodios/core",
   "description": "Typescript API client with autocompletion and zod validations",
-  "version": "11.0.2",
-  "main": "lib/index.js",
-  "module": "lib/index.mjs",
-  "typings": "lib/index.d.ts",
+  "version": "12.0.0",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "typings": "dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./lib/index.mjs",
-      "require": "./lib/index.js",
-      "types": "./lib/index.d.ts"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
     },
-    "./lib/*.types": {
-      "import": "./lib/*.types.mjs",
-      "require": "./lib/*.types.js",
-      "types": "./lib/*.types.d.ts"
+    "./dist/*.types": {
+      "import": "./dist/*.types.mjs",
+      "require": "./dist/*.types.js",
+      "types": "./dist/*.types.d.ts"
     },
     "./package.json": "./package.json"
   },
   "files": [
-    "lib"
+    "dist"
   ],
   "author": {
     "name": "ecyrbe",
@@ -28,6 +28,9 @@
   "contributors": [
     {
       "name": "chrisbenincasa"
+    },
+    {
+      "name": "nmcdaines"
     }
   ],
   "homepage": "https://github.com/ecyrbe/zodios",
@@ -44,7 +47,7 @@
     "validation"
   ],
   "scripts": {
-    "prebuild": "rimraf lib",
+    "prebuild": "rimraf dist",
     "example": "ts-node examples/jsonplaceholder.ts",
     "example:dev.to": "ts-node examples/dev.to/example.ts",
     "major-rc": "npm version premajor --preid=rc",
@@ -55,7 +58,7 @@
     "test": "jest --coverage"
   },
   "peerDependencies": {
-    "axios": "^1.11.0",
+    "axios": "^0.x || ^1.0.0",
     "zod": "^4.0.0"
   },
   "devDependencies": {
@@ -74,7 +77,7 @@
     "ts-node": "10.9.1",
     "tsup": "^8.5.0",
     "typescript": "5.8.3",
-    "zod": "^3.25.20"
+    "zod": "^4.0.0"
   },
   "packageManager": "yarn@1.22.22+sha512.a6b2f7906b721bba3d67d4aff083df04dad64c399707841b7acf00f6b133b7ac24255f2652fa22ae3534329dc6180534e98d17432037ff6fd140556e2bb3137e"
 }

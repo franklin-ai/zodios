@@ -1,10 +1,11 @@
-import {
+import type {
   AxiosError,
   AxiosInstance,
   AxiosRequestConfig,
   AxiosResponse,
 } from "axios";
-import z from "zod/v4";
+import z3 from "zod/v3";
+import z4 from "zod/v4";
 import type {
   FilterArrayByKey,
   FilterArrayByValue,
@@ -63,8 +64,8 @@ export type ZodiosResponseForEndpoint<
   Endpoint extends ZodiosEndpointDefinition,
   Frontend extends boolean = true
 > = Frontend extends true
-  ? z.output<Endpoint["response"]>
-  : z.input<Endpoint["response"]>;
+  ? z4.output<Endpoint["response"]>
+  : z4.input<Endpoint["response"]>;
 
 export type ZodiosResponseByPath<
   Api extends ZodiosEndpointDefinition[],
@@ -72,16 +73,16 @@ export type ZodiosResponseByPath<
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true
 > = Frontend extends true
-  ? z.output<ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["response"]>
-  : z.input<ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["response"]>;
+  ? z4.output<ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["response"]>
+  : z4.input<ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["response"]>;
 
 export type ZodiosResponseByAlias<
   Api extends ZodiosEndpointDefinition[],
   Alias extends string,
   Frontend extends boolean = true
 > = Frontend extends true
-  ? z.output<ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["response"]>
-  : z.input<ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["response"]>;
+  ? z4.output<ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["response"]>
+  : z4.input<ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["response"]>;
 
 export type ZodiosDefaultErrorForEndpoint<
   Endpoint extends ZodiosEndpointDefinition
@@ -120,7 +121,7 @@ export type ZodiosErrorForEndpoint<
   Status extends number,
   Frontend extends boolean = true
 > = Frontend extends true
-  ? z.output<
+  ? z4.output<
       IfNever<
         FilterArrayByValue<
           Endpoint["errors"],
@@ -131,7 +132,7 @@ export type ZodiosErrorForEndpoint<
         ZodiosDefaultErrorForEndpoint<Endpoint>
       >
     >
-  : z.input<
+  : z4.input<
       IfNever<
         FilterArrayByValue<
           Endpoint["errors"],
@@ -150,7 +151,7 @@ export type ZodiosErrorByPath<
   Status extends number,
   Frontend extends boolean = true
 > = Frontend extends true
-  ? z.output<
+  ? z4.output<
       IfNever<
         FilterArrayByValue<
           ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
@@ -161,7 +162,7 @@ export type ZodiosErrorByPath<
         ZodiosDefaultErrorByPath<Api, M, Path>
       >
     >
-  : z.input<
+  : z4.input<
       IfNever<
         FilterArrayByValue<
           ZodiosEndpointDefinitionByPath<Api, M, Path>[number]["errors"],
@@ -181,7 +182,7 @@ export type ErrorsToAxios<T, Acc extends unknown[] = []> = T extends [
       status: infer Status;
       schema: infer Schema;
     }
-    ? Schema extends z.ZodTypeAny
+    ? Schema extends z4.core.$ZodType
       ? ErrorsToAxios<
           Tail,
           [
@@ -190,7 +191,7 @@ export type ErrorsToAxios<T, Acc extends unknown[] = []> = T extends [
               Omit<AxiosError, "status" | "response">,
               {
                 response: Merge<
-                  AxiosError<z.output<Schema>>["response"],
+                  AxiosError<z4.output<Schema>>["response"],
                   {
                     status: Status extends "default"
                       ? 0 & { error: Status }
@@ -226,7 +227,7 @@ export type ZodiosErrorByAlias<
   Status extends number,
   Frontend extends boolean = true
 > = Frontend extends true
-  ? z.output<
+  ? z4.output<
       IfNever<
         FilterArrayByValue<
           ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
@@ -237,7 +238,7 @@ export type ZodiosErrorByAlias<
         ZodiosDefaultErrorByAlias<Api, Alias>
       >
     >
-  : z.input<
+  : z4.input<
       IfNever<
         FilterArrayByValue<
           ZodiosEndpointDefinitionByAlias<Api, Alias>[number]["errors"],
@@ -268,8 +269,8 @@ export type ZodiosBodyForEndpoint<
   Endpoint extends ZodiosEndpointDefinition,
   Frontend extends boolean = true
 > = Frontend extends true
-  ? z.input<BodySchemaForEndpoint<Endpoint>>
-  : z.output<BodySchemaForEndpoint<Endpoint>>;
+  ? z4.input<BodySchemaForEndpoint<Endpoint>>
+  : z4.output<BodySchemaForEndpoint<Endpoint>>;
 
 export type ZodiosBodyByPath<
   Api extends ZodiosEndpointDefinition[],
@@ -277,8 +278,8 @@ export type ZodiosBodyByPath<
   Path extends ZodiosPathsByMethod<Api, M>,
   Frontend extends boolean = true
 > = Frontend extends true
-  ? z.input<BodySchema<Api, M, Path>>
-  : z.output<BodySchema<Api, M, Path>>;
+  ? z4.input<BodySchema<Api, M, Path>>
+  : z4.output<BodySchema<Api, M, Path>>;
 
 export type BodySchemaByAlias<
   Api extends ZodiosEndpointDefinition[],
@@ -293,8 +294,8 @@ export type ZodiosBodyByAlias<
   Alias extends string,
   Frontend extends boolean = true
 > = Frontend extends true
-  ? z.input<BodySchemaByAlias<Api, Alias>>
-  : z.output<BodySchemaByAlias<Api, Alias>>;
+  ? z4.input<BodySchemaByAlias<Api, Alias>>
+  : z4.output<BodySchemaByAlias<Api, Alias>>;
 
 export type ZodiosQueryParamsForEndpoint<
   Endpoint extends ZodiosEndpointDefinition,
@@ -611,7 +612,7 @@ export type ZodiosOptions = {
   axiosConfig?: AxiosRequestConfig;
 };
 
-export type ZodiosEndpointParameter<T = unknown> = {
+export type ZodiosEndpointParameter<S = unknown> = {
   /**
    * name of the parameter
    */
@@ -628,12 +629,12 @@ export type ZodiosEndpointParameter<T = unknown> = {
    * zod schema of the parameter
    * you can use zod `transform` to transform the value of the parameter before sending it to the server
    */
-  schema: z.ZodType<T>;
+  schema: z4.core.$ZodType<S>;
 };
 
 export type ZodiosEndpointParameters = ZodiosEndpointParameter[];
 
-export type ZodiosEndpointError<T = unknown> = {
+export type ZodiosEndpointError<S = unknown> = {
   /**
    * status code of the error
    * use 'default' to declare a default error
@@ -646,13 +647,13 @@ export type ZodiosEndpointError<T = unknown> = {
   /**
    * schema of the error
    */
-  schema: z.ZodType<T>;
+  schema: z4.ZodType<S>;
 };
 
 export type ZodiosEndpointErrors = ZodiosEndpointError[];
 
 /**
- * Zodios enpoint definition that should be used to create a new instance of Zodios
+ * Zodios endpoint definition that should be used to create a new instance of Zodios
  */
 export interface ZodiosEndpointDefinition<R = unknown> {
   /**
@@ -696,7 +697,7 @@ export interface ZodiosEndpointDefinition<R = unknown> {
    * response of the endpoint
    * you can use zod `transform` to transform the value of the response before returning it
    */
-  response: z.ZodType<R>;
+  response: z4.core.$ZodType;
   /**
    * optional response status of the endpoint for sucess, default is 200
    * customize it if your endpoint returns a different status code and if you need openapi to generate the correct status code
@@ -712,7 +713,7 @@ export interface ZodiosEndpointDefinition<R = unknown> {
   errors?: Array<ZodiosEndpointError>;
 }
 
-export type ZodiosEndpointDefinitions = ZodiosEndpointDefinition[];
+export type ZodiosEndpointDefinitions<T extends z4.core.$ZodType = z4.core.$ZodType> = ZodiosEndpointDefinition<T>[];
 
 /**
  * Zodios plugin that can be used to intercept zodios requests and responses
