@@ -55,7 +55,13 @@ export type Narrow<T> =
   // If it's a function, preserve it
   T extends Function ? T :
 
-  // If it's an array, unwrap its element type recursively
+  // Try to narrow primitives to their literal types
+  T extends string | number | bigint | boolean ? T :
+
+  // If it's a readonly array, unwrap and make mutable
+  T extends readonly (infer U)[] ? Narrow<U>[] :
+
+  // If it's a regular array, unwrap its element type recursively
   T extends (infer U)[] ? Narrow<U>[] :
 
   // If it's an object, unwrap each property recursively

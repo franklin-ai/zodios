@@ -691,7 +691,7 @@ export interface ZodiosEndpointDefinition<R = unknown> {
   /**
    * optional parameters of the endpoint
    */
-  parameters?: Array<ZodiosEndpointParameter>;
+  parameters?: ZodiosEndpointParameter[];
   /**
    * response of the endpoint
    * you can use zod `transform` to transform the value of the response before returning it
@@ -709,7 +709,7 @@ export interface ZodiosEndpointDefinition<R = unknown> {
   /**
    * optional errors of the endpoint - only usefull when using @zodios/express
    */
-  errors?: Array<ZodiosEndpointError>;
+  errors?: ZodiosEndpointError[];
 }
 
 export type ZodiosEndpointDefinitions = ZodiosEndpointDefinition[];

@@ -17,7 +17,7 @@ import {
  * @return - nothing
  * @throws - error if api has non unique paths
  */
-export function checkApi<Api extends ZodiosEndpointDefinitions>(api: Api) {
+export function checkApi<Api extends ZodiosEndpointDefinition[]>(api: Api) {
   // check if no duplicate path
   const paths = new Set<string>();
   for (let endpoint of api) {
@@ -62,8 +62,8 @@ export function checkApi<Api extends ZodiosEndpointDefinitions>(api: Api) {
 export function makeApi<const Api extends ZodiosEndpointDefinition[]>(
   api: Api
 ): Api {
-  checkApi(api);
-  return api as Api;
+  checkApi(api as any);
+  return api;
 }
 
 /*
