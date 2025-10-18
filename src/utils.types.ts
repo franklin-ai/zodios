@@ -52,13 +52,23 @@ export type Narrow<T> =
   // If it's a Zod schema, don't try and process it 
   T extends z4.core.$ZodType ? T :
 
-  // If it's an array, unwrap its element type recursively
+  // If it's a function, preserve it
+  T extends Function ? T :
+
+  // Try to narrow primitives to their literal types
+  T extends string | number | bigint | boolean ? T :
+
+  // If it's a readonly array, unwrap and make mutable
+  T extends readonly (infer U)[] ? Narrow<U>[] :
+
+  // If it's a regular array, unwrap its element type recursively
   T extends (infer U)[] ? Narrow<U>[] :
 
   // If it's an object, unwrap each property recursively
   T extends Record<string | number | symbol, any>
     ? { [K in keyof T]: Narrow<T[K]> }
     : T;
+
 
 /**
  * merge all union types into a single type

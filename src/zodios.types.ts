@@ -4,8 +4,7 @@ import type {
   AxiosRequestConfig,
   AxiosResponse,
 } from "axios";
-import z3 from "zod/v3";
-import z4 from "zod/v4";
+import type * as z4 from "zod/v4";
 import type {
   FilterArrayByKey,
   FilterArrayByValue,
@@ -692,7 +691,7 @@ export interface ZodiosEndpointDefinition<R = unknown> {
   /**
    * optional parameters of the endpoint
    */
-  parameters?: Array<ZodiosEndpointParameter>;
+  parameters?: ZodiosEndpointParameter[];
   /**
    * response of the endpoint
    * you can use zod `transform` to transform the value of the response before returning it
@@ -710,10 +709,10 @@ export interface ZodiosEndpointDefinition<R = unknown> {
   /**
    * optional errors of the endpoint - only usefull when using @zodios/express
    */
-  errors?: Array<ZodiosEndpointError>;
+  errors?: ZodiosEndpointError[];
 }
 
-export type ZodiosEndpointDefinitions<T extends z4.core.$ZodType = z4.core.$ZodType> = ZodiosEndpointDefinition<T>[];
+export type ZodiosEndpointDefinitions = ZodiosEndpointDefinition[];
 
 /**
  * Zodios plugin that can be used to intercept zodios requests and responses

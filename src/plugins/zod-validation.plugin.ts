@@ -1,6 +1,7 @@
 import { ZodiosError } from "../zodios-error";
 import type { ZodiosOptions, ZodiosPlugin } from "../zodios.types";
 import { findEndpoint } from "../utils";
+import type * as z4 from "zod/v4";
 
 type Options = Required<
   Pick<ZodiosOptions, "validate" | "transform" | "sendDefaults">
@@ -67,8 +68,9 @@ export function zodValidationPlugin({
             const { name, schema, type } = parameter;
             const value = paramsOf[type](name);
             if (sendDefaults || value !== undefined) {
-              // @ts-expect-error
-              const parsed = await schema.safeParseAsync(value);
+              const parsed = await (
+                schema as z4.ZodType
+              ).safeParseAsync(value);
               if (!parsed.success) {
                 throw new ZodiosError(
                   `Zodios: Invalid ${type} parameter '${name}'`,
@@ -100,10 +102,9 @@ export function zodValidationPlugin({
               "application/vnd.api+json"
             )
           ) {
-            // @ts-expect-error
-            const parsed = await endpoint.response.safeParseAsync(
-              response.data
-            );
+            const parsed = await (
+              endpoint.response as z4.ZodType
+            ).safeParseAsync(response.data);
             if (!parsed.success) {
               throw new ZodiosError(
                 `Zodios: Invalid response from endpoint '${endpoint.method} ${
