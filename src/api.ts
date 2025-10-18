@@ -59,8 +59,8 @@ export function checkApi<Api extends ZodiosEndpointDefinitions>(api: Api) {
  * @param api - api definitions
  * @returns the api definitions
  */
-export function makeApi<S extends z4.core.$ZodType,  Api extends ZodiosEndpointDefinitions<S>>(
-  api: Narrow<Api>
+export function makeApi<const Api extends ZodiosEndpointDefinition[]>(
+  api: Api
 ): Api {
   checkApi(api);
   return api as Api;
@@ -256,7 +256,7 @@ export function makeCrudApi<
   schema: S
 ) {
   const capitalizedResource = capitalize(resource);
-  return makeApi<S, ZodiosEndpointDefinitions<S>>([
+  return makeApi([
     {
       method: "get",
       path: `/${resource}s`,

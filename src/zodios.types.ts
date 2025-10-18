@@ -4,8 +4,7 @@ import type {
   AxiosRequestConfig,
   AxiosResponse,
 } from "axios";
-import z3 from "zod/v3";
-import z4 from "zod/v4";
+import type * as z4 from "zod/v4";
 import type {
   FilterArrayByKey,
   FilterArrayByValue,
@@ -713,7 +712,7 @@ export interface ZodiosEndpointDefinition<R = unknown> {
   errors?: Array<ZodiosEndpointError>;
 }
 
-export type ZodiosEndpointDefinitions<T extends z4.core.$ZodType = z4.core.$ZodType> = ZodiosEndpointDefinition<T>[];
+export type ZodiosEndpointDefinitions = ZodiosEndpointDefinition[];
 
 /**
  * Zodios plugin that can be used to intercept zodios requests and responses
